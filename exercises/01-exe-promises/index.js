@@ -31,24 +31,51 @@ console.log("Waiting for the fake server to reply...");
 
 // ----- Server simulation of random response -----
 // ----- You have to make it work as intended -----
+
 const serverResponse = new Promise(responseHandler);
 
-serverResponse.then().catch();
+serverResponse.then(  (data) => {
+  updateDOMWithData(data)
+})
+  
+.catch((error) => {
+  updateDOMWithError(error)
+});
 
 function updateDOMWithData(data) {
-  const html = ``; // build the html for data here
+  const html = document.createElement("div")
+  
+  html.innerHTML = `<div class="container">
+  <article class="product">
+    <img src="${data.img}" alt="">
+    <h3>${data.item}</h3>
+    <h3>$ ${data.price}</h3>
+    <h4>Year: ${data.year}</h4>
+  </article>
+</div>`; // build the html for data here
 
   // Append the HTML to the DOM here
+  document.body.appendChild(html)
 }
 
 function updateDOMWithError(error) {
-  const html = ``; // build the html for the error here
+  const html = document.createElement("div")
+  
+  html.innerHTML = `<div class="container error">
+  <article class="product">
+    <h1>ERROR</h1>
+    <p>${error}</p>
+    <img src="https://vignette.wikia.nocookie.net/battlefordreamisland/images/f/f1/Roboty_book.png/revision/latest?cb=20190908174044" alt="">
+  </article>
+</div>`; // build the html for the error here
 
   // Append the HTML to the DOM here
+  document.body.appendChild(html)
 }
 
 function responseHandler(resolveCb, rejectCb) {
   const serverIsUp = Math.random() > 0.5 ? true : false; //this is a trick to get a 50% chance that the server is broken
+  
 
   const data = {
     item: "MacBook Pro 16",
@@ -63,6 +90,8 @@ function responseHandler(resolveCb, rejectCb) {
     () => {
       // Read the "serverIsUp" flag here
       // and handle the promise to dispaly the correct HTML into the DOM here.
+      if (serverIsUp) resolveCb(data)
+      else rejectCb(error)
     },
 
     1000 + Math.random() * 1000 // This is a random waiting time between 1000 and 2000 ms
